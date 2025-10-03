@@ -1,0 +1,73 @@
+name: custom:jdbc-vscode-example
+version: 0.0.1
+minDynatraceVersion: 1.318.0
+author:
+  name: Dynatrace
+featureSetsMetadata:
+  - id: log ingest example
+    isRecommended: true
+    description: "This featureset is used to ingest query data as logs from the `orders` table"
+# variables are defined so values can be set within the monitoring configuration in the UI/API.
+vars:
+  - id: log_query_interval  
+    displayName: Log query Interval
+    description: The interval at which the queries which ingest logs will be executed
+    type: text
+    defaultValue: "1"
+  - id: endpoint_metadata
+    type: text
+    displayName: Endpoint Metadata
+    perItem: true    
+  - id: product_code_filter
+    description: >-
+      A pattern to filter which products are monitored. See [this community article](https://community.dynatrace.com/t5/Dynatrace-tips/Extensions-2-0-How-to-use-dimension-filters/m-p/189340) for more details.
+    type: multiline-text
+    maxLength: 50000
+metrics:
+  - key: jdbc_example.product_quantity
+    metadata:
+      displayName: Product quantity
+      unit: Unspecified
+      description: The quantity of products in the products table.
+jdbc:
+  driverClassName: org.mariadb.jdbc.Driver
+  validationQuery: SELECT 1
+  versionQuery: SELECT 1
+  connectionStringPattern: ^jdbc:mariadb://.*$
+  connectionStringPatternErrorMessage: "The connection string must be a valid JDBC
+    MySQL connection string starting with 'jdbc:mariadb://', check:
+    https://mariadb.com/kb/en/about-mariadb-connector-j"
+  errorMessage: An error occurred while trying to connect to the database. Please
+    check the connection details and try again.
+  groups:
+  # If a feature set is not defined (like in this case), then the metrics will belong to
+  # the default feature set.
+  - group: product queries
+    ingest: metrics
+    query: SELECT product_code, count(*) as quantity FROM products
+    metrics:
+      - key: jdbc_example.product_quantity
+        value: col:quantity
+        type: gauge  
+    dimensions:
+      - key: product_code
+        value: col:product_code
+        filter: var:product_code_filter 
+      - key: endpoint_metadata
+        value: var:endpoint_metadata
+  - group: log ingest example
+    featureSet: Log Order Ingest
+    interval:
+      minutes: var:log_query_interval
+    # For example, the interval at which the query which ingests logs is exectuted can be set 
+    # in the monitoring configuration. This is defined in the `vars:` section.
+    ingest: log
+    query: SELECT order_description, product_id FROM orders
+    attributes:
+      - key: content
+        value: col:order_description
+      - key: productID
+        value: col:product_id
+      - key: table
+        value: const:orders
+          
