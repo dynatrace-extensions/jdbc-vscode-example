@@ -1,34 +1,58 @@
+#                      Minimal Example Extension - JDBC
+# ==================================================================================================
+# Repositories for each data source can be found in the following lines:
+# ==================================================================================================
+# JDBC   https://github.com/dynatrace-extensions/jdbc-vscode-example
+# SQL    https://github.com/dynatrace-extensions/sql-vscode-example
+# JMX    https://github.com/dynatrace-extensions/jmx-vscode-example
+# SNMP   https://github.com/dynatrace-extensions/snmp-vscode-example
+# PYTHON https://github.com/dynatrace-extensions/python-vscode-example 
+# WMI    https://github.com/dynatrace-extensions/wmi-vscode-example
+# ==================================================================================================
+# Dynatrace documentation for each data source can be found in the following lines:
+# ==================================================================================================
+# JDBC/SQL https://docs.dynatrace.com/docs/shortlink/sql-reference
+# JMX      https://docs.dynatrace.com/docs/shortlink/jmx-extensions-reference
+# SNMP     https://docs.dynatrace.com/docs/shortlink/snmp-extensions-reference
+# PYTHON   https://dt-url.net/7g638yh
+# WMI      https://docs.dynatrace.com/docs/shortlink/wmi-extensions-reference
+# ==================================================================================================
+# For general extesnion yaml guidance, check out:
+#
+# https://docs.dynatrace.com/docs/shortlink/extension-yaml
+# ==================================================================================================
+# Purpose:
+#
+# These example extensions exist to provide minimal examples of how to ingest
+# data for each data source. They are not meant to be comprehensive, but rather
+# provide a useful starting point to creating custom extensions.
+# ==================================================================================================
+# NOTE: For best results, work with these examples using the VS Code Dynatrace Extensions Add-On.
+# https://marketplace.visualstudio.com/items?itemName=DynatracePlatformExtensions.dynatrace-extensions
+# ==================================================================================================
+
 name: custom:jdbc-vscode-example
 version: 0.0.1
 minDynatraceVersion: 1.318.0
 author:
-  name: Dynatrace
-featureSetsMetadata:
-  - id: log ingest example
-    isRecommended: true
-    description: "This featureset is used to ingest query data as logs from the `orders` table"
-# variables are defined so values can be set within the monitoring configuration in the UI/API.
-vars:
-  - id: log_query_interval  
-    displayName: Log query Interval
-    description: The interval at which the queries which ingest logs will be executed
-    type: text
-    defaultValue: "1"
-  - id: endpoint_metadata
-    type: text
-    displayName: Endpoint Metadata
-    perItem: true    
-  - id: product_code_filter
-    description: >-
-      A pattern to filter which products are monitored. See [this community article](https://community.dynatrace.com/t5/Dynatrace-tips/Extensions-2-0-How-to-use-dimension-filters/m-p/189340) for more details.
-    type: multiline-text
-    maxLength: 50000
+  name: "Your Name Here"
+  
+# Define metadata for the metrics that will be ingested
 metrics:
+  # Its a good practice to name metric keys with a prefix that relates to the extension's name/function
   - key: jdbc_example.product_quantity
+    # While not required, metadata is useful for viewing metric descriptions in the UI, and allows for intelligent formatting of units in DQL Tables or dashboard charts for example.
     metadata:
       displayName: Product quantity
-      unit: Unspecified
       description: The quantity of products in the products table.
+      # Available units can be browsed with the 'auto-complete' functionality of VS Code using the Dynatrace Extensions Add-On.
+      # This example uses the `Unspecified` unit. But if this metric was gathering disk space  data, the unit could be set to `MegaByte`.
+      unit: Unspecified
+      
+# This node defines the data source that will be used for gathering data. Note that The `JDBC`
+# configuration slightly varies different than the `sql*` configurations, since information for the
+# JDBC driver has to be specified. See https://docs.dynatrace.com/docs/shortlink/jdbc-monitoring for
+# more details.
 jdbc:
   driverClassName: org.mariadb.jdbc.Driver
   validationQuery: SELECT 1
@@ -39,9 +63,8 @@ jdbc:
     https://mariadb.com/kb/en/about-mariadb-connector-j"
   errorMessage: An error occurred while trying to connect to the database. Please
     check the connection details and try again.
+    
   groups:
-  # If a feature set is not defined (like in this case), then the metrics will belong to
-  # the default feature set.
   - group: product queries
     ingest: metrics
     query: SELECT product_code, count(*) as quantity FROM products
@@ -52,15 +75,12 @@ jdbc:
     dimensions:
       - key: product_code
         value: col:product_code
-        filter: var:product_code_filter 
-      - key: endpoint_metadata
-        value: var:endpoint_metadata
+        
   - group: log ingest example
-    featureSet: Log Order Ingest
+    # featureSet: Log Order Ingest
     interval:
-      minutes: var:log_query_interval
-    # For example, the interval at which the query which ingests logs is exectuted can be set 
-    # in the monitoring configuration. This is defined in the `vars:` section.
+      minutes: 5
+    # The SQL data source can ingest logs from query results as well as metrics. The `content` key ALWAYS mut be included. Additional attributes can be defined as shown below.
     ingest: log
     query: SELECT order_description, product_id FROM orders
     attributes:
@@ -69,5 +89,6 @@ jdbc:
       - key: productID
         value: col:product_id
       - key: table
+        # The `const` keyword indicates that this value is not dependent on a column fetched from the query, its some piece of hard-coded data defined within the extension.yaml  
         value: const:orders
           
