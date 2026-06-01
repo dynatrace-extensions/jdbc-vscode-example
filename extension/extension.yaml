@@ -1,21 +1,12 @@
 #                      Minimal Example Extension - JDBC
 # ==================================================================================================
-# Repositories for each data source can be found in the following lines:
+# The repository for this data source can be found below:
 # ==================================================================================================
-# JDBC   https://github.com/dynatrace-extensions/jdbc-vscode-example
-# SQL    https://github.com/dynatrace-extensions/sql-vscode-example
-# JMX    https://github.com/dynatrace-extensions/jmx-vscode-example
-# SNMP   https://github.com/dynatrace-extensions/snmp-vscode-example
-# PYTHON https://github.com/dynatrace-extensions/python-vscode-example 
-# WMI    https://github.com/dynatrace-extensions/wmi-vscode-example
+# JDBC:   https://github.com/dynatrace-extensions/jdbc-vscode-example
 # ==================================================================================================
-# Dynatrace documentation for each data source can be found in the following lines:
+# Dynatrace documentation for the data source can be found in the following lines:
 # ==================================================================================================
-# JDBC/SQL https://docs.dynatrace.com/docs/shortlink/sql-reference
-# JMX      https://docs.dynatrace.com/docs/shortlink/jmx-extensions-reference
-# SNMP     https://docs.dynatrace.com/docs/shortlink/snmp-extensions-reference
-# PYTHON   https://dt-url.net/7g638yh
-# WMI      https://docs.dynatrace.com/docs/shortlink/wmi-extensions-reference
+# JDBC/SQL: https://docs.dynatrace.com/docs/shortlink/sql-reference
 # ==================================================================================================
 # For general extesnion yaml guidance, check out:
 #
