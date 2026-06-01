@@ -56,7 +56,6 @@ jdbc:
         value: col:product_code
         
   - group: log ingest example
-    # featureSet: Log Order Ingest
     interval:
       minutes: 5
     # The SQL data source can ingest logs from query results as well as metrics. The `content` key ALWAYS mut be included. Additional attributes can be defined as shown below.
